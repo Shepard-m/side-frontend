@@ -1,0 +1,27 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-index-modal-overlay);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 16px;
+
+  background-color: rgb(0 0 0 / 48%);
+
+  pointer-events: auto;
+}
+
+.modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+
+  background-color: var(--white);
+  border-radius: 24px;
+}

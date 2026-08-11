@@ -1,0 +1,36 @@
+.header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: var(--z-index-header);
+
+  display: grid;
+  grid-template-columns: minmax(19px, 1fr) minmax(0, auto) 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding-bottom: 12px;
+
+  background-color: var(--white);
+
+  .header__backButton {
+    justify-self: start;
+  }
+
+  .header__name {
+    min-width: 0;
+
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .header__notificationButton {
+    justify-self: end;
+  }
+}
+
+@media (width < 600px) {
+  .header {
+    padding-block: 12px;
+  }
+}

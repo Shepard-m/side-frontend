@@ -1,0 +1,47 @@
+.button {
+  padding-inline: 0;
+
+  text-decoration: none;
+
+  background-color: transparent;
+  border: none;
+
+  transition:
+    color 0.3s ease-in,
+    background-color 0.3s ease-in;
+
+  cursor: pointer;
+
+  &:disabled {
+    &.button_primary {
+      color: var(--gray-500);
+
+      background-color: var(--gray-200);
+      border: 1px solid var(--gray-300);
+
+      cursor: not-allowed;
+    }
+  }
+}
+
+.button_primary {
+  padding: 10px;
+
+  color: var(--white);
+
+  background-color: var(--blue);
+  border-radius: 14px;
+}
+
+.button_fullWidth {
+  width: 100%;
+}
+
+.button_default {
+  padding: 10px;
+
+  color: var(--black);
+
+  background-color: var(--gray-200);
+  border-radius: 10px;
+}
