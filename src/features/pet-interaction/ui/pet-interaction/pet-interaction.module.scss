@@ -1,0 +1,14 @@
+.petInteraction {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  gap: 10px;
+
+  .petInteraction__buttonFood {
+    background-color: var(--green-500);
+  }
+
+  .petInteraction__buttonPet {
+    background-color: var(--purple);
+  }
+}

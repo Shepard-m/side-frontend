@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { dailyTasksQueryKeys } from '@/entities/daily-task';
+import { shopItemsQueryKeys } from '@/entities/shop-things';
 import { API_URL } from '@/shared/config';
 import { getSessionStorageValue, sessionStorageKeysMap } from '@/shared/lib';
 
@@ -12,10 +13,39 @@ import type { TPet } from '../api/pet';
 
 import { usePetProfile } from './use-pet-profile';
 
+type TPetProgress = Pick<
+  TPet,
+  | 'bedImageUrl'
+  | 'bowlImageUrl'
+  | 'chestPrice'
+  | 'leaves'
+  | 'level'
+  | 'levelUp'
+  | 'name'
+  | 'nextLevelTargetLeaves'
+>;
+
+type TPetState = Pick<
+  TPet,
+  | 'calculatedAt'
+  | 'decaysToZeroAt'
+  | 'feedNextAvailableAt'
+  | 'happiness'
+  | 'happinessMultiplier'
+  | 'strokeNextAvailableAt'
+>;
+
 type PetProgressSocketEvent = {
   event: 'PET_PROGRESS_UPDATED';
-  data: TPet;
+  data: TPetProgress;
 };
+
+type PetStateSocketEvent = {
+  event: 'PET_STATE_UPDATED';
+  data: TPetState;
+};
+
+type PetSocketEvent = PetProgressSocketEvent | PetStateSocketEvent;
 
 const INITIAL_RECONNECT_DELAY = 1_000;
 const MAX_RECONNECT_DELAY = 10_000;
@@ -65,9 +95,13 @@ export const usePetProfileSocket = ({ enabled }: TUsePetProfileSocketProps) => {
 
       socket.onmessage = (event) => {
         try {
-          const payload = JSON.parse(event.data) as PetProgressSocketEvent;
+          const payload = JSON.parse(event.data) as PetSocketEvent;
 
-          if (payload.event !== 'PET_PROGRESS_UPDATED') {
+          if (payload.event === 'PET_STATE_UPDATED') {
+            void queryClient.invalidateQueries({
+              queryKey: gamificationProfileKeys.pet(),
+            });
+
             return;
           }
 
@@ -77,7 +111,16 @@ export const usePetProfileSocket = ({ enabled }: TUsePetProfileSocketProps) => {
             payload.data.levelUp ||
             (previousPet !== undefined && payload.data.level > previousPet.level);
 
-          updatePetProfile(payload.data);
+          if (previousPet) {
+            updatePetProfile({
+              ...previousPet,
+              ...payload.data,
+            });
+          } else {
+            void queryClient.invalidateQueries({
+              queryKey: gamificationProfileKeys.pet(),
+            });
+          }
 
           if (isLevelUpdated) {
             void Promise.all([
@@ -86,6 +129,9 @@ export const usePetProfileSocket = ({ enabled }: TUsePetProfileSocketProps) => {
               }),
               queryClient.invalidateQueries({
                 queryKey: dailyTasksQueryKeys.list(),
+              }),
+              queryClient.invalidateQueries({
+                queryKey: shopItemsQueryKeys.list(),
               }),
             ]);
           }
@@ -99,12 +145,6 @@ export const usePetProfileSocket = ({ enabled }: TUsePetProfileSocketProps) => {
       };
 
       socket.onclose = (event) => {
-        console.log('Pet WebSocket закрыт', {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean,
-        });
-
         if (disposed) {
           return;
         }

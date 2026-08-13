@@ -23,7 +23,8 @@ const FOCUSABLE_ELEMENTS_SELECTOR = [
 type BottomPanelProps = {
   title: ReactNode;
   description?: string;
-  children: ReactNode;
+  children?: ReactNode;
+  renderContent?: (close: () => void) => ReactNode;
   renderTrigger: (open: () => void) => ReactNode;
   closeOnBackdrop?: boolean;
   disabled?: boolean;
@@ -35,6 +36,7 @@ export const BottomPanel = ({
   title,
   description,
   children,
+  renderContent,
   renderTrigger,
   closeOnBackdrop = true,
   disabled = false,
@@ -77,10 +79,6 @@ export const BottomPanel = ({
   }
 
   function handleClose() {
-    previouslyFocusedElementRef.current?.focus({
-      preventScroll: true,
-    });
-
     setIsOpen(false);
   }
 
@@ -233,20 +231,13 @@ export const BottomPanel = ({
               tabIndex={-1}
               style={panelStyle}
             >
-              <button
-                type="button"
-                className={styles.panel__handleButton}
-                aria-label="Закрыть панель"
+              <header
+                className={styles.panel__header}
                 onPointerCancel={handleDragCancel}
                 onPointerDown={handleDragStart}
                 onPointerMove={handleDragMove}
                 onPointerUp={handleDragEnd}
-                tabIndex={-1}
               >
-                <div className={styles.panel__handleLine} aria-hidden="true" tabIndex={-1} />
-              </button>
-
-              <header className={styles.panel__header}>
                 <Typography className={styles.panel__title} id={titleId} variant="section" as="h2">
                   {title}
                 </Typography>
@@ -266,12 +257,22 @@ export const BottomPanel = ({
                   className={styles.panel__close}
                   aria-label="Закрыть панель"
                   onClick={handleClose}
+                  onPointerDown={(event) => event.stopPropagation()}
                 >
-                  ×
+                  <Typography
+                    className={styles.panel__closeText}
+                    as="span"
+                    color="black"
+                    variant="display-normal"
+                  >
+                    ×
+                  </Typography>
                 </button>
               </header>
 
-              <div className={styles.panel__content}>{children}</div>
+              <div className={styles.panel__content}>
+                {renderContent ? renderContent(handleClose) : children}
+              </div>
             </section>
           </div>,
           portalRoot,

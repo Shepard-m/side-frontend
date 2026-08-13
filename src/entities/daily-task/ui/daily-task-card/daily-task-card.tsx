@@ -1,5 +1,3 @@
-import { data } from 'react-router';
-
 import { BottomPanel } from '@/shared/ui/bottom-panel';
 import { GamificationCard } from '@/shared/ui/gamification-card';
 
@@ -39,7 +37,7 @@ export const DailyTaskCard = () => {
       title={TITLE_CARD}
       disabled={!tasks}
       onClick={() => {
-        if (!data && !isPending) {
+        if (!tasks && !isPending) {
           refetch();
         }
       }}

@@ -1,5 +1,6 @@
-@use "./variables";
-@use "./normalize";
+@use './variables';
+@use './normalize';
+@use './basic-tutorial';
 
 html,
 body {
@@ -15,4 +16,10 @@ html,
 body,
 #root {
   min-height: 100%;
+
+  background-color: var(--white);
+}
+
+body {
+  min-height: 100dvh;
 }
